@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Autocomplete jquery</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+<link href="http://code.jquery.com/ui/1.10.2/themes/smoothness/jquery-ui.css" rel="Stylesheet"></link>
+<script src='https://cdn.rawgit.com/pguso/jquery-plugin-circliful/master/js/jquery.circliful.min.js'></script>
+<script src="http://code.jquery.com/ui/1.10.2/jquery-ui.js" ></script>
+
+</head>
+<body>
+
+<div class="container">
+
+    <input type="text" name="autocomplete" id="autocomplete" class="form-control" >
+    <br>
+    <input type="text" name="multi_autocomplete" id="multi_autocomplete" class="form-control" >
+</div>
+
+<script type="text/javascript">
+
+    /*Auto Complete with Downloaded Json*/
+    /*
+    $("#autocomplete").autocomplete({  
+        source: function(request, response) {
+            var data = [{
+                        label: "hi",
+                        value: "bye"
+                    }];
+            response(data);
+        },
+        select: function( event, ui ) {
+            $( "#autocomplete" ).val( ui.item.label); //ui.item is your object from the array
+            return false;
+        }
+    });
+    */
+
+    /*Auto Complete with realtime API Json*/
+    $("#autocomplete" ).autocomplete({
+          source: function( request, response ) {
+               $.ajax({
+                url: "http://localhost:5001/wesensedev/us-central1/testAPI",
+                type: 'post',
+                dataType: "json",
+                mode: 'cors',
+                data: {
+                 search: request.term
+                },
+                success: function(data) {
+                    response(data.data);
+                }
+               });
+          },
+          select: function (event, ui) {
+               $('#autocomplete').val(ui.item.label); // display the selected text
+               $('#selectuser_id').val(ui.item.value); // save selected id to input
+               return false;
+          }
+     });
+    /*Auto Complete with realtime API Json*/
+
+
+     /*Auto Complete with realtime API Json*/
+         $( "#multi_autocomplete" ).autocomplete({
+            source: function( request, response ) {
+              var searchText = extractLast(request.term);
+              $.ajax({
+                 url: "http://localhost:5001/wesensedev/us-central1/testAPI",
+                 type: 'post',
+                 dataType: "json",
+                 data: {
+                   search: searchText
+                 },
+                 success: function( data ) {
+                   response( data );
+                 }
+               });
+            },
+            select: function( event, ui ) {
+                var terms = split( $('#multi_autocomplete').val() );                
+                terms.pop();                
+                terms.push( ui.item.label );                
+                terms.push( "" );
+                $('#multi_autocomplete').val(terms.join( ", " ));
+                // Id
+                terms = split( $('#selectuser_ids').val() );                
+                terms.pop();
+                terms.push( ui.item.value );
+                terms.push( "" );
+                $('#selectuser_ids').val(terms.join( ", " ));
+                return false;
+             }
+         });
+         function split(val) {
+           return val.split( /,\s*/ );
+         }
+         function extractLast(term) {
+           return split(term).pop();
+         }
+    /*Auto Complete with realtime API Json*/
+
+</script>
+
+</body>
+</html>
